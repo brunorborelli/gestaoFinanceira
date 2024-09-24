@@ -22,6 +22,9 @@ public class MetaService {
     @Autowired
     private GrupoRepository grupoRepository;
 
+    @Autowired
+    private GrupoService grupoService;
+
     public Optional<Meta> buscarMetaPorGrupoECategoria(Long grupoId, Categoria categoria) {
         return metaRepository.findByGrupoIdAndCategoria(grupoId, categoria);
     }
@@ -38,7 +41,7 @@ public class MetaService {
             metaRepository.save(meta);
 
             if (novoValorAtual < 0) {
-                meta.getGrupo().setSaldoNegativo(true);
+                grupoService.atualizarSaldoNegativo(meta.getGrupo(), true);
             }
         }
     }

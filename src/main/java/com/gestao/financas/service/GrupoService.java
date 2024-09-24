@@ -5,6 +5,7 @@ import com.gestao.financas.model.Grupo;
 import com.gestao.financas.model.Meta;
 import com.gestao.financas.repository.GrupoRepository;
 import com.gestao.financas.repository.MetaRepository;
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,11 +28,17 @@ public class GrupoService {
         grupoRepository.save(grupo);
     }
 
+    public Grupo buscarPorId(Long id){
+        return grupoRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException(id,"Grupo não encontrado"));
+
+    }
+
     public Grupo salvar(Grupo grupo) {
         return grupoRepository.save(grupo);
     }
 
-    public Optional<Grupo> buscarPorId(Long id) {
+    public Optional<Grupo> findById(Long id) {
         return grupoRepository.findById(id);
     }
 

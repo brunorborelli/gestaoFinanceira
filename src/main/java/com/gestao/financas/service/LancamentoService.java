@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,19 +29,25 @@ public class LancamentoService {
     @Autowired
     private GrupoRepository grupoRepository;
 
+    @Autowired
+    private GrupoService grupoService;
+
     @Transactional
     public Lancamento criarLancamento(Long grupoId, String nome, String descricao, LocalDate data, Tipo tipo, Double valor, Categoria categoria) {
 
         Optional<Meta> metaOpt = metaService.buscarMetaPorGrupoECategoria(grupoId, categoria);
-
+        validaLancamentoCategoria(categoria);
         if (metaOpt.isPresent()) {
             Meta meta = metaOpt.get();
-            Lancamento lancamento = new Lancamento(null, nome, descricao, data, tipo, valor, categoria, meta.getGrupo());
+            Lancamento lancamento =
+                    new Lancamento(null, nome, descricao, data, tipo, valor, categoria, meta.getGrupo());
 
             lancamentoRepository.save(lancamento);
 
             boolean isDespesa = tipo == Tipo.DESPESA;
             metaService.atualizarValorMeta(meta.getId(), valor, isDespesa);
+            //informar que o grupo esta negativo;
+            lancamento.setNegativouGrupo(meta.getGrupo().getSaldoNegativo());
 
             return lancamento;
         } else {
@@ -79,4 +86,18 @@ public class LancamentoService {
                 .orElseThrow(() -> new IllegalArgumentException("Lançamento não encontrado"));
         lancamentoRepository.delete(lancamento);
     }
+
+    public void validaLancamentoCategoria(Categoria categoria) {
+        if (categoria == null) {
+            throw new IllegalArgumentException("A categoria não pode ser nula.");
+        }
+        boolean categoriaValida = Arrays.stream(Categoria.values())
+                .anyMatch(c -> c == categoria);
+
+        if (!categoriaValida) {
+            throw new IllegalArgumentException("Categoria inválida. Categorias válidas:" +
+                    " ALIMENTACAO, EDUCACAO, TRANSPORTE, SAUDE, LAZER, MORADIA, VESTUARIO, OUTROS");
+        }
+    }
+
 }

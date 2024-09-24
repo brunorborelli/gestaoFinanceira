@@ -35,6 +35,9 @@ public class Lancamento {
     @JoinColumn(name = "grupo_id", nullable = false)
     private Grupo grupo;
 
+    @Transient
+    private boolean negativouGrupo;
+
     public Lancamento() {
     }
 
@@ -113,5 +116,13 @@ public class Lancamento {
 
     public void setGrupo(Grupo grupo) {
         this.grupo = grupo;
+    }
+
+    public boolean isNegativouGrupo() {
+        return negativouGrupo;
+    }
+
+    public void setNegativouGrupo(boolean negativouGrupo) {
+        this.negativouGrupo = negativouGrupo;
     }
 }

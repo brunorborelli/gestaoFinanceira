@@ -18,8 +18,8 @@ public class LancamentoController {
     private LancamentoService lancamentoService;
 
     @PostMapping("/criar")
-    public Lancamento criarLancamento(@RequestBody LancamentoDTO lancamentoDTO) {
-        return lancamentoService.criarLancamento(
+    public ResponseEntity<?> criarLancamento(@RequestBody LancamentoDTO lancamentoDTO) {
+        Lancamento lancamento = lancamentoService.criarLancamento(
                 lancamentoDTO.getGrupoId(),
                 lancamentoDTO.getNome(),
                 lancamentoDTO.getDescricao(),
@@ -28,6 +28,11 @@ public class LancamentoController {
                 lancamentoDTO.getValor(),
                 lancamentoDTO.getCategoria()
         );
+
+        if (lancamento.isNegativouGrupo()) {
+            return ResponseEntity.ok("O grupo ficou negativado após este lançamento.");
+        }
+        return ResponseEntity.ok(lancamento);
     }
 
     @GetMapping("/{id}")
